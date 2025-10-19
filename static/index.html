@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Trend Predictor</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 2rem; max-width: 800px; margin: auto }
+      label { display:block; margin-top: .5rem }
+      input, button { padding: .5rem; font-size: 1rem }
+      .result { margin-top: 1rem; padding: .75rem; background:#f7f7f7; border-radius:6px }
+    </style>
+  </head>
+  <body>
+    <h1>Trend Predictor</h1>
+    <p>Enter a ticker or leave blank to use synthetic data.</p>
+    <label>Ticker (optional): <input id="ticker" placeholder="AAPL" /></label>
+    <label>Days: <input id="days" type="number" value="180" /></label>
+    <button id="predict">Get prediction</button>
+
+    <div id="output" class="result" style="display:none"></div>
+
+    <script>
+      const btn = document.getElementById('predict')
+      const out = document.getElementById('output')
+      btn.onclick = async () => {
+        out.style.display = 'block'
+        out.textContent = 'Loading...'
+        const ticker = document.getElementById('ticker').value
+        const days = parseInt(document.getElementById('days').value || 180)
+        const body = {}
+        if (ticker) body.ticker = ticker
+        body.days = days
+
+        try {
+          const res = await fetch('/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          const json = await res.json()
+          out.innerHTML = '<pre>' + JSON.stringify(json, null, 2) + '</pre>'
+        } catch (err) {
+          out.textContent = 'Error: ' + err.message
+        }
+      }
+    </script>
+  </body>
+</html>
